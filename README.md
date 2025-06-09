@@ -14,7 +14,7 @@ The pipeline automates:
 ## 📁 Project Structure
 
 ```
-env\_inequality/
+envineq/
 ├── data/                # Raw, processed, and external data
 ├── notebooks/           # Exploratory Jupyter Notebooks
 ├── envineq/             # Core Python package
