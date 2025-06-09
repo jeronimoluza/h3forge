@@ -31,7 +31,7 @@ env\_inequality/
 ## 🛰️ Datasets Used
 
 - **Sentinel-5P NO₂** (Copernicus)
-- **NDVI** (MODIS or Landsat-based)
+- **MODIS NDVI**
 - **GHSL Population Density**
 - Socioeconomic data (to be integrated)
 
