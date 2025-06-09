@@ -668,6 +668,60 @@ warp = ["rasterio"]
 xr = ["xarray (>=0.19)"]
 
 [[package]]
+name = "odc-loader"
+version = "0.5.1"
+description = "Tooling for constructing xarray objects from parsed metadata"
+optional = false
+python-versions = ">=3.10"
+groups = ["main"]
+files = [
+    {file = "odc_loader-0.5.1-py3-none-any.whl", hash = "sha256:fbe505e2f0e8ac4db2542935bdf5f706e6147817d818073a8a98d3226bd6470f"},
+    {file = "odc_loader-0.5.1.tar.gz", hash = "sha256:bf3adf53b10248bbab3bb1fcb043995c12e204dbde4f9a751cd3331b1c6a1212"},
+]
+
+[package.dependencies]
+dask = {version = "*", extras = ["array"]}
+numpy = ">=1.20.0"
+odc-geo = ">=0.4.7"
+rasterio = ">=1.0.0,<1.3.0 || >1.3.0,<1.3.1 || >1.3.1"
+xarray = ">=0.19"
+
+[package.extras]
+botocore = ["botocore"]
+zarr = ["zarr (>=2.18.3,<3)"]
+
+[[package]]
+name = "odc-stac"
+version = "0.4.0"
+description = "Tooling for converting STAC metadata to ODC data model"
+optional = false
+python-versions = ">=3.8"
+groups = ["main"]
+files = [
+    {file = "odc_stac-0.4.0-py3-none-any.whl", hash = "sha256:a76b9d96d7aea53cabcd7ba99b0cf467a6eab6d2ad6a52802af36b5c407c5952"},
+    {file = "odc_stac-0.4.0.tar.gz", hash = "sha256:3535767940840e8c3ec2e3dda15ac36e30de0e51624dcc82e1052e19a7dab091"},
+]
+
+[package.dependencies]
+affine = "*"
+dask = {version = "*", extras = ["array"]}
+numpy = ">=1.20.0"
+odc-geo = ">=0.4.7"
+odc-loader = ">=0.5.1"
+pandas = "*"
+pystac = ">=1.0.0,<2"
+rasterio = ">=1.0.0,<1.3.0 || >1.3.0,<1.3.1 || >1.3.1"
+toolz = "*"
+typing-extensions = "*"
+xarray = ">=0.19"
+
+[package.extras]
+botocore = ["botocore"]
+docs = ["datacube (>=1.8.8)", "distributed", "ipykernel", "ipython", "matplotlib-inline", "nbsphinx", "pandas", "sphinx", "sphinx-autodoc-typehints", "sphinx_rtd_theme"]
+test = ["distributed", "geopandas", "pystac_client", "pytest", "pytest-cov", "pytest-timeout"]
+test-all = ["datacube", "distributed", "geopandas", "pystac_client", "pytest", "pytest-cov", "pytest-timeout", "stackstac"]
+
+[[package]]
 name = "packaging"
 version = "25.0"
 description = "Core utilities for Python packages"
@@ -1400,29 +1454,6 @@ files = [
 ]
 
 [[package]]
-name = "stackstac"
-version = "0.5.1"
-description = "Load a STAC collection into xarray with dask"
-optional = false
-python-versions = "<4.0,>=3.8"
-groups = ["main"]
-files = [
-    {file = "stackstac-0.5.1-py3-none-any.whl", hash = "sha256:3c596c9ccf502b6230b1c9e970a8099eeb94df867d0dea2fd45071223cb581e7"},
-    {file = "stackstac-0.5.1.tar.gz", hash = "sha256:1af0e1251100fe506b1f3c035ffcc34111ad67b264275d14a6775c4991e5f7f6"},
-]
-
-[package.dependencies]
-dask = {version = ">=2022.1.1", extras = ["array"]}
-numpy = ">1.23,<3"
-pandas = ">=2,<3"
-pyproj = ">=3.0.0,<4.0.0"
-rasterio = ">=1.3.0,<2.0.0"
-xarray = ">=0.18"
-
-[package.extras]
-viz = ["Pillow (>=9.0.1,<10.0.0)", "aiohttp (>=3.7.4,<4.0.0)", "cachetools (>=4.2.2,<5.0.0)", "distributed (>=2022.1.1)", "ipyleaflet (>=0.13.6,<1.0.0)", "ipywidgets (>=7.6.3,<8.0.0)", "jupyter-server-proxy (>=3.2)", "matplotlib (>=3.4.1)", "mercantile (>=1.1.6,<2.0.0)", "scipy (>=1.6.1,<2.0.0)"]
-
-[[package]]
 name = "toolz"
 version = "1.0.0"
 description = "List processing tools and functional utilities"
@@ -1441,7 +1472,6 @@ description = "Backported and Experimental Type Hints for Python 3.9+"
 optional = false
 python-versions = ">=3.9"
 groups = ["main"]
-markers = "python_version < \"3.13\""
 files = [
     {file = "typing_extensions-4.14.0-py3-none-any.whl", hash = "sha256:a1514509136dd0b477638fc68d6a91497af5076466ad0fa6c338e44e359944af"},
     {file = "typing_extensions-4.14.0.tar.gz", hash = "sha256:8676b788e32f02ab42d9e7c61324048ae4c6d844a399eebace3d4979d75ceef4"},
@@ -1527,4 +1557,4 @@ type = ["pytest-mypy"]
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10, <4.0"
-content-hash = "0bc984c1547219756283faa2139f59f1bd524ae7c4ba772d2225111284ec5393"
+content-hash = "5d1a08557c60bcb91a663836c49355eed0034a898fbf38d0de23fbc2d080bc69"

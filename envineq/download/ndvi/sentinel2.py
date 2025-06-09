@@ -1,64 +1,88 @@
-import stackstac
-import pystack_client
+import pystac_client
+from odc.stac import configure_rio, load
+import dask.distributed
 import os
 
+# from shapely.geometry import mapping # Required if region needs conversion via mapping()
+
+# --- Environment Configuration ---
+# IMPORTANT: Hardcoding credentials is a security risk.
+# Consider using environment variables set outside the script or a secure secrets management system.
 os.environ["GDAL_HTTP_TCP_KEEPALIVE"] = "YES"
 os.environ["AWS_S3_ENDPOINT"] = "eodata.dataspace.copernicus.eu"
-os.environ["AWS_ACCESS_KEY_ID"] = "your_access_key"  # !
-os.environ["AWS_SECRET_ACCESS_KEY"] = "your_secret_access_key"  # !
+# Ensure these are set in your environment or replace placeholders securely
+os.environ["AWS_ACCESS_KEY_ID"] = os.getenv(
+    "AWS_ACCESS_KEY_ID", "your_access_key"
+)  # ! Fallback for clarity
+os.environ["AWS_SECRET_ACCESS_KEY"] = os.getenv(
+    "AWS_SECRET_ACCESS_KEY", "your_secret_access_key"
+)  # ! Fallback for clarity
 os.environ["AWS_HTTPS"] = "YES"
 os.environ["AWS_VIRTUAL_HOSTING"] = "FALSE"
-os.environ["GDAL_HTTP_UNSAFESSL"] = "YES"
-
-
-URL = "https://stac.dataspace.copernicus.eu/v1"
-cat = pystac_client.Client.open(URL)
-cat.add_conforms_to("ITEM_SEARCH")
-
-geom = {
-    "type": "Polygon",
-    "coordinates": [
-        [
-            [14.254, 50.014],
-            [14.587, 50.014],
-            [14.587, 50.133],
-            [14.254, 50.133],
-            [14.254, 50.014],
-        ]
-    ],
-}
-
-params = {
-    "max_items": 100,
-    "collections": "sentinel-2-l2a",
-    "datetime": "2017-06-01/2017-09-30",
-    "intersects": geom,
-    "query": {"eo:cloud_cover": {"lte": 20}},
-    "sortby": "properties.eo:cloud_cover",
-    "fields": {"exclude": ["geometry"]},
-}
-
-items = list(cat.search(**params).items_as_dicts())
-
-stack = stackstac.stack(
-    items=items,
-    bounds_latlon=(14.254, 50.014, 14.587, 50.133),
-    chunksize=98304,
-    epsg=32634,
-    gdal_env=stackstac.DEFAULT_GDAL_ENV.updated(
-        {
-            "GDAL_NUM_THREADS": -1,
-            "GDAL_HTTP_UNSAFESSL": "YES",
-            "GDAL_HTTP_TCP_KEEPALIVE": "YES",
-            "AWS_VIRTUAL_HOSTING": "FALSE",
-            "AWS_HTTPS": "YES",
-        }
-    ),
+os.environ["GDAL_HTTP_UNSAFESSL"] = (
+    "YES"  # Note: Unsafe SSL might be needed for some endpoints but use with caution
 )
+os.environ["AWS_NO_SIGN_REQUEST"] = "YES"
 
-rgb = stack.sel(band=["B04_20m", "B03_20m", "B02_20m"])
 
-nir = stack.sel(band="B08_10m")
-red = stack.sel(band="B04_10m")
+# --- STAC API Configuration ---
+COPERNICUS_STAC_URL = "https://earth-search.aws.element84.com/v1/"
 
-ndvi = (nir - red) / (nir + red)
+
+def get_data(region, start_date: str, end_date: str, cloud_cover: float):
+    """
+    Downloads Sentinel-2 L2A data for a given region and time period,
+    calculates NDVI, and returns it as an xarray.DataArray.
+
+    Args:
+        region: A GeoJSON-like dictionary or an object with __geo_interface__ (e.g., Shapely geometry)
+                representing the area of interest.
+        start_date (str): Start date in 'YYYY-MM-DD' format.
+        end_date (str): End date in 'YYYY-MM-DD' format.
+        cloud_cover (float): Maximum cloud cover percentage (0-100).
+
+    Returns:
+        xarray.DataArray: NDVI data for the specified region and time.
+    """
+    bbox = region.bounds
+    catalog = pystac_client.Client.open(COPERNICUS_STAC_URL)
+
+    filter_query = {
+        "eo:cloud_cover": {
+            "lte": cloud_cover
+        }
+    }
+    query = catalog.search(
+        collections=["sentinel-2-l2a"],
+        datetime=f"{start_date}/{end_date}",
+        limit=100,
+        bbox=bbox,
+        query=filter_query
+    )
+
+
+    items = list(query.items())
+    print(f"Found: {len(items):d} datasets")
+    return items
+
+    data_stack = load(
+        items,
+        bands=("red", "nir"),
+        # crs=crs,
+        resolution=10,
+        chunks={},  # <-- use Dask
+        groupby="solar_day",
+    )
+    data_stack = data_stack.rio.clip([region], crs=f"EPSG:4326") # Assumes geom_filter is GeoJSON
+
+    # Select NIR and Red bands for NDVI calculation
+    # Sentinel-2 bands: B04 is Red, B08 is NIR (both at 10m resolution)
+    nir_band = data_stack.get("nir")
+    red_band = data_stack.get("red")
+
+    # Calculate NDVI: (NIR - Red) / (NIR + Red)
+    ndvi = (nir_band - red_band) / (nir_band + red_band)
+    # ndvi = ndvi.rio.write_crs(data_stack.rio.crs)  # Ensure CRS is set
+
+
+    return ndvi, red_band, nir_band
