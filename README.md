@@ -83,4 +83,4 @@ pytest tests/
 
 ### 📬 Contact
 
-For questions or collaborations, reach out to \[[jero.luza@gmail.com](mailto:jero.luza@gmail.com)].
+For questions or collaborations, reach out to [jero.luza@gmail.com](mailto:jero.luza@gmail.com).
