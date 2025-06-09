@@ -7,12 +7,11 @@ start_date = "2020-01-01"
 end_date = "2020-03-01"
 cloud_cover = 0.2
 
-#ndvi, red_band, nir_band = envineq.download.ndvi.sentinel2.get_data(
-items = envineq.download.ndvi.sentinel2.get_data(
+ndvi_array = envineq.download.sentinel2.get_ndvi(
     region=region,
     start_date=start_date,
     end_date=end_date,
     cloud_cover=cloud_cover,
 )
-print(items)
 
+# computed = ndvi_array.compute()
