@@ -1,6 +1,6 @@
 # envineq
 
-This repository contains the data processing pipeline for a research project on environmental inequality. The goal is to understand how environmental factors like air pollution and vegetation are distributed across socio-economic regions in Latin American cities.
+This repository contains the data processing pipeline for a research project on environmental inequality. The goal is to understand how environmental factors like air pollution and vegetation are distributed across socio-economic regions in metropolitan areas.
 
 ## 🌎 Overview
 
@@ -40,8 +40,8 @@ env\_inequality/
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/yourusername/env_inequality.git
-cd env_inequality
+git clone https://github.com/jeronimoluza/envineq.git
+cd envineq
 pip install -r requirements.txt
 ````
 
