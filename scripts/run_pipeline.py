@@ -1,7 +1,6 @@
 import envineq
-from geocube.vector import vectorize
 region = envineq.utils.load_wkt(
-    "POLYGON((-58.531448 -34.526553, -58.335143 -34.526553, -58.335143 -34.705815, -58.531448 -34.705815, -58.531448 -34.526553))"
+    "POLYGON((-58.519638 -34.549585, -58.484587 -34.549585, -58.484587 -34.572794, -58.519638 -34.572794, -58.519638 -34.549585))"
 )
 start_date = "2020-01-01"
 end_date = "2020-03-01"
@@ -14,4 +13,5 @@ ndvi_array = envineq.download.sentinel2.get_ndvi(
     cloud_cover=cloud_cover,
 )
 
-# computed = ndvi_array.compute()
+
+vectors = envineq.preprocess.vectorize(ndvi_array, region=region)

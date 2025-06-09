@@ -25,7 +25,6 @@ class Sentinel2Connector:
         self.cloud_cover = cloud_cover
         self.catalog = pystac_client.Client.open(STAC_URL)
         self.items = None
-        self._band_properties_cache = {} # Cache for scale/offset factors
 
     def _search_items(self):
         """Performs the STAC search if items have not been fetched yet."""
@@ -74,57 +73,12 @@ class Sentinel2Connector:
             intersects=self.region,
         )
         
-        # Manually apply scale and offset factors for each band
+        # Ensure all bands are float and compute
         for band_name in data_stack.data_vars:
-            if band_name in bands_to_load: # Apply only to requested bands that were loaded
-                props = self._get_band_properties(str(band_name))
-                scale = props.get('scale', 1.0)
-                offset = props.get('offset', 0.0)
-                # Ensure band data is float before scaling if it's not already
-                # odc.stac.load might return float if dtype isn't specified as int
+            if band_name in bands_to_load:
                 data_stack[band_name] = data_stack[band_name].astype(float, copy=False).compute()
 
         return data_stack
-
-    def _get_band_properties(self, band_name: str) -> dict:
-        """
-        Extracts scale, offset, and nodata for a given band from the first STAC item.
-        Assumes these properties are consistent across items for the same band.
-        Caches results to avoid redundant extraction.
-        """
-        if band_name in self._band_properties_cache:
-            return self._band_properties_cache[band_name]
-
-        if not self.items:
-            self._search_items()
-        
-        if not self.items:
-            print(f"Warning: No STAC items found to extract properties for band '{band_name}'.")
-            return {'scale': 1.0, 'offset': 0.0, 'nodata': None}
-
-        # Use the first item to get band properties
-        # Asset keys in STAC items should match the 'bands_to_load' names
-        first_item = self.items[0]
-        scale = 1.0
-        offset = 0.0
-        nodata = None
-
-        if band_name in first_item.assets:
-            asset = first_item.assets[band_name]
-            raster_bands_info = asset.extra_fields.get('raster:bands', [{}])
-            if raster_bands_info and isinstance(raster_bands_info, list) and len(raster_bands_info) > 0:
-                band_meta = raster_bands_info[0]
-                scale = band_meta.get('scale', 1.0)
-                offset = band_meta.get('offset', 0.0)
-                nodata = band_meta.get('nodata') # Can be 0 or other value
-            else:
-                print(f"Warning: 'raster:bands' metadata missing or malformed for asset '{band_name}' in item '{first_item.id}'.")
-        else:
-            print(f"Warning: Asset '{band_name}' not found in first STAC item '{first_item.id}'.")
-
-        properties = {'scale': scale, 'offset': offset, 'nodata': nodata}
-        self._band_properties_cache[band_name] = properties
-        return properties
 
     def compute_ndvi(self, resolution=10):
         """
@@ -153,9 +107,7 @@ class Sentinel2Connector:
         nir_band = bands_dataset["nir"]
         red_band = bands_dataset["red"]
 
-        # Add a small epsilon to the denominator to prevent division by zero errors
-        epsilon = 1e-8 
-        ndvi = (nir_band - red_band) / (nir_band + red_band + epsilon)
+        ndvi = (nir_band - red_band) / (nir_band + red_band)
         ndvi.name = "ndvi"
         
         return ndvi
