@@ -2,7 +2,6 @@ import pystac_client
 import planetary_computer
 from odc.stac import load
 
-# STAC_URL = "https://earth-search.aws.element84.com/v1/"
 STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1/"
 
 
@@ -138,4 +137,3 @@ def get_ndvi(region, start_date: str, end_date: str, cloud_cover: float):
         # Optionally, could return an empty DataArray or raise an error
 
     return ndvi_array
-
