@@ -1,14 +1,19 @@
 import pystac_client
-import xarray as xr
+import planetary_computer
 from odc.stac import load
 
-STAC_URL = "https://earth-search.aws.element84.com/v1/"
+# STAC_URL = "https://earth-search.aws.element84.com/v1/"
+STAC_URL = "https://planetarycomputer.microsoft.com/api/stac/v1/"
+
 
 class Sentinel2Connector:
     """
     Connector class to fetch and load Sentinel-2 STAC data.
     """
-    def __init__(self, region, start_date: str, end_date: str, cloud_cover: float):
+
+    def __init__(
+        self, region, start_date: str, end_date: str, cloud_cover: float
+    ):
         """
         Initializes the connector with search parameters.
 
@@ -23,7 +28,10 @@ class Sentinel2Connector:
         self.start_date = start_date
         self.end_date = end_date
         self.cloud_cover = cloud_cover
-        self.catalog = pystac_client.Client.open(STAC_URL)
+        self.catalog = pystac_client.Client.open(
+            STAC_URL,
+            modifier=planetary_computer.sign_inplace,
+        )
         self.items = None
 
     def _search_items(self):
@@ -39,7 +47,7 @@ class Sentinel2Connector:
             datetime=f"{self.start_date}/{self.end_date}",
             limit=100,  # Consider making this configurable
             bbox=bbox,
-            query=filter_query
+            query=filter_query,
         )
         self.items = list(query.items())
         print(f"Found: {len(self.items):d} datasets for the query.")
@@ -51,7 +59,7 @@ class Sentinel2Connector:
         Args:
             bands_to_load (tuple or list): List of band names to load (e.g., ('red', 'nir')).
             resolution (int): Spatial resolution in meters.
-            crs (str, optional): Target Coordinate Reference System (e.g., "EPSG:4326"). 
+            crs (str, optional): Target Coordinate Reference System (e.g., "EPSG:4326").
                                  If None, uses the CRS of the first item.
             chunks (dict): Dask chunking configuration.
 
@@ -69,14 +77,16 @@ class Sentinel2Connector:
             resolution=resolution,
             crs=crs,
             chunks=chunks,
-            groupby="solar_day", # Groups by day to handle multiple scenes per day if any
+            groupby="solar_day",  # Groups by day to handle multiple scenes per day if any
             intersects=self.region,
         )
-        
+
         # Ensure all bands are float and compute
         for band_name in data_stack.data_vars:
             if band_name in bands_to_load:
-                data_stack[band_name] = data_stack[band_name].astype(float, copy=False).compute()
+                data_stack[band_name] = (
+                    data_stack[band_name].astype(float, copy=False).compute()
+                )
 
         return data_stack
 
@@ -91,12 +101,14 @@ class Sentinel2Connector:
         Returns:
             xarray.DataArray: Calculated NDVI, or None if bands could not be loaded.
         """
-        bands_dataset = self.load_bands(bands_to_load=('red', 'nir'), resolution=resolution)
+        bands_dataset = self.load_bands(
+            bands_to_load=("red", "nir"), resolution=resolution
+        )
 
         if bands_dataset is None or not bands_dataset.data_vars:
             print("Could not load 'red' and 'nir' bands for NDVI calculation.")
             return None
-        
+
         if "nir" not in bands_dataset:
             print("Error: 'nir' band not found in loaded dataset.")
             return None
@@ -109,8 +121,9 @@ class Sentinel2Connector:
 
         ndvi = (nir_band - red_band) / (nir_band + red_band)
         ndvi.name = "ndvi"
-        
+
         return ndvi
+
 
 def get_ndvi(region, start_date: str, end_date: str, cloud_cover: float):
     """
@@ -119,9 +132,10 @@ def get_ndvi(region, start_date: str, end_date: str, cloud_cover: float):
     """
     connector = Sentinel2Connector(region, start_date, end_date, cloud_cover)
     ndvi_array = connector.compute_ndvi(resolution=10)
-    
+
     if ndvi_array is None:
         print("Failed to compute NDVI.")
         # Optionally, could return an empty DataArray or raise an error
-        
+
     return ndvi_array
+
