@@ -1,0 +1,1 @@
+from .raster_to_vector import vectorize

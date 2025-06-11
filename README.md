@@ -31,7 +31,7 @@ envineq/
 ## 🛰️ Datasets Used
 
 - **Sentinel-5P NO₂** (Copernicus)
-- **MODIS NDVI**
+- **Sentinel 2 L2 NDVI**
 - **GHSL Population Density**
 - Socioeconomic data (to be integrated)
 
