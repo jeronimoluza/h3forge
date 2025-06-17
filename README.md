@@ -1,6 +1,6 @@
 # h3forge
 
-This repository contains the data processing pipeline for a research project on environmental inequality. The goal is to understand how environmental factors like air pollution and vegetation are distributed across socio-economic regions in metropolitan areas.
+A Python tool for processing geospatial data into H3 hexagonal grids. h3forge simplifies the workflow of downloading, processing, and aggregating geospatial data into the H3 spatial indexing system, making it easier to perform spatial analysis and visualization.
 
 ## 🌎 Overview
 
@@ -26,14 +26,13 @@ h3forge/
 ├── tests/               # Unit tests
 ├── requirements.txt     # Python dependencies
 └── README.md            # Project documentation
-````
+```
 
 ## 🛰️ Datasets Used
 
-- **Sentinel-5P NO₂** (Copernicus)
-- **Sentinel 2 L2 NDVI**
-- **GHSL Population Density**
-- Socioeconomic data (to be integrated)
+- **Sentinel-5P**
+- **Sentinel 2 Level-2**
+- **Global Human Settlements Layer (GHSL)**
 
 ## ⚙️ Installation
 
@@ -43,37 +42,75 @@ Clone the repo and install dependencies:
 git clone https://github.com/jeronimoluza/h3forge.git
 cd h3forge
 pip install -r requirements.txt
-````
-
-You may also want to install geospatial dependencies via conda:
-
-```bash
-conda create -n h3forge python=3.11 geopandas rasterio h3-py
-conda activate h3forge
-pip install -r requirements.txt
 ```
 
 ## 🚀 Usage
 
-Run individual modules or use the included scripts to run an end-to-end pipeline. For exploration and documentation, refer to the `notebooks/` folder.
+h3forge provides a streamlined workflow for processing geospatial data into H3 hexagons.
 
-Example:
+```python
+import h3forge
 
-```bash
-python scripts/run_pipeline.py
+# 1. Define your region of interest (WKT format)
+region = h3forge.utils.load_wkt(
+    "POLYGON((-58.521952 -34.549793, -58.487812 -34.549793, -58.487812 -34.568679, -58.521952 -34.568679, -58.521952 -34.549793))"
+)
+
+# 2. Download satellite data (e.g., Sentinel-2 NDVI)
+start_date = "2020-01-01"
+end_date = "2020-01-20"
+cloud_cover = 0.2
+
+ndvi_array = h3forge.download.sentinel2.get_ndvi(
+    region=region,
+    start_date=start_date,
+    end_date=end_date,
+    cloud_cover=cloud_cover,
+)
+
+# 3. Vectorize the raster data (with date information)
+vectors = h3forge.preprocess.vectorize(ndvi_array, region=region)
+
+# 4. Convert vectors to H3 hexagons (resolution 13)
+hexes = h3forge.features.vector_to_h3(vectors, region=region, resolution=13)
+
+# 5. Aggregate to coarser resolution with time aggregation
+h3_agg = h3forge.features.h3_aggregation(
+    hexes, 
+    region=region, 
+    resolution=8,  # Target resolution 
+    time_agg='yearly',  # Temporal aggregation (options: 'daily', 'monthly', 'yearly', None)
+    strategy='mean'  # Aggregation strategy (options: 'mean', 'sum', 'min', 'max')
+)
 ```
-
 ## 🧪 Testing
 
 ```bash
 pytest tests/
 ```
 
-## 📖 Notebooks
+## Key Features
 
-* `01_download_sources.ipynb`: Download and inspect datasets
-* `02_transform_rasters.ipynb`: Raster-to-vector processing
-* `03_hex_aggregation.ipynb`: Aggregation to H3 for analysis
+### Data Download
+- Download satellite imagery (Sentinel-2, Sentinel-5P)
+- Filter by date range and cloud cover
+- Automatically clip to region of interest
+
+### Data Processing
+- Convert raster data to vector format
+- Preserve temporal information in vectorized data
+- Filter by region of interest
+
+### H3 Integration
+- Convert vector geometries to H3 hexagons at any resolution
+- Replicate attribute values from input geometries
+- Optionally include hexagon geometries
+
+### Aggregation
+- Aggregate data to coarser H3 resolutions
+- Temporal aggregation (daily, monthly, yearly)
+- Multiple aggregation strategies (mean, sum, min, max)
+- Filter by region of interest
 
 ## 📚 License
 
