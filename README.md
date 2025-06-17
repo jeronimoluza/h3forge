@@ -26,7 +26,7 @@ h3forge/
 ├── tests/               # Unit tests
 ├── requirements.txt     # Python dependencies
 └── README.md            # Project documentation
-````
+```
 
 ## 🛰️ Datasets Used
 
@@ -41,14 +41,6 @@ Clone the repo and install dependencies:
 ```bash
 git clone https://github.com/jeronimoluza/h3forge.git
 cd h3forge
-pip install -r requirements.txt
-````
-
-You may also want to install geospatial dependencies via conda:
-
-```bash
-conda create -n h3forge python=3.11 geopandas rasterio h3-py
-conda activate h3forge
 pip install -r requirements.txt
 ```
 
