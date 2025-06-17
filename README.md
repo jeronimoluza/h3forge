@@ -1,4 +1,4 @@
-# envineq
+# h3forge
 
 This repository contains the data processing pipeline for a research project on environmental inequality. The goal is to understand how environmental factors like air pollution and vegetation are distributed across socio-economic regions in metropolitan areas.
 
@@ -14,10 +14,10 @@ The pipeline automates:
 ## 📁 Project Structure
 
 ```
-envineq/
+h3forge/
 ├── data/                # Raw, processed, and external data
 ├── notebooks/           # Exploratory Jupyter Notebooks
-├── envineq/             # Core Python package
+├── h3forge/             # Core Python package
 │   ├── download/        # Downloaders for datasets
 │   ├── preprocess/      # Raster/vector transformations
 │   ├── features/        # Hexagonal aggregation and spatial features
@@ -40,16 +40,16 @@ envineq/
 Clone the repo and install dependencies:
 
 ```bash
-git clone https://github.com/jeronimoluza/envineq.git
-cd envineq
+git clone https://github.com/jeronimoluza/h3forge.git
+cd h3forge
 pip install -r requirements.txt
 ````
 
 You may also want to install geospatial dependencies via conda:
 
 ```bash
-conda create -n envineq python=3.11 geopandas rasterio h3-py
-conda activate envineq
+conda create -n h3forge python=3.11 geopandas rasterio h3-py
+conda activate h3forge
 pip install -r requirements.txt
 ```
 
