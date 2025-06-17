@@ -20,8 +20,7 @@ vectors = h3forge.preprocess.vectorize(ndvi_array, region=region)
 hexes = h3forge.features.vector_to_h3(vectors, region=region, resolution=10)
 
 h3_agg = h3forge.features.h3_aggregation(
-    hexes, region=region, resolution=8, time_agg='yearly', strategy='mean'
+    hexes, region=region, resolution=8, time_agg='daily', strategy='mean'
 )
 
 print(h3_agg)
-h3_agg.to_csv('test.csv')

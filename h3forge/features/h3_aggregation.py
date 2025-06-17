@@ -75,7 +75,7 @@ def h3_aggregation(hexes, region=None, resolution=8, time_agg=None, strategy='me
         group_cols = ['parent_hex', 'time_group']
     else:
         # Group only by parent hex
-        group_cols = ['parent_hex']
+        group_cols = ['parent_hex','date']
     
     # Identify numeric columns for aggregation (excluding geometry, hex, parent_hex, date, etc.)
     exclude_cols = ['geometry', 'hex', 'parent_hex', 'date', 'datetime', 'time_group']
@@ -128,6 +128,7 @@ def h3_aggregation(hexes, region=None, resolution=8, time_agg=None, strategy='me
         result_gdf.rename(columns={'time_group': 'date'}, inplace=True)
         result_gdf['date'] = pd.to_datetime(result_gdf['date']).dt.strftime('%Y-%m-%d')
     
+    print(result_gdf)
     # Sort by hex and date
     result_gdf.sort_values(by=['date', 'hex'], inplace=True)
     
