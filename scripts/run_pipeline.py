@@ -17,11 +17,10 @@ ndvi_array = h3forge.download.sentinel2.get_ndvi(
 
 vectors = h3forge.preprocess.vectorize(ndvi_array, region=region)
 
-hexes = h3forge.features.vector_to_h3(vectors, region=region, resolution=10, include_geometry=True)
+hexes = h3forge.features.vector_to_h3(vectors, region=region, resolution=10)
 
-print(hexes)
-hexes.to_csv('test.csv')
-raise
 h3_agg = h3forge.features.h3_aggregation(
-    hexes, region=region, resolution=8, strategy='mean'
+    hexes, region=region, resolution=8, time_agg='daily', strategy='mean'
 )
+
+print(h3_agg)
