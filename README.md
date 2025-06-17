@@ -28,7 +28,7 @@ h3forge/
 └── README.md            # Project documentation
 ```
 
-## 🛰️ Datasets Used
+## 🛰️ Datasets
 
 - **Sentinel-5P**
 - **Sentinel 2 Level-2**
@@ -39,9 +39,12 @@ h3forge/
 Clone the repo and install dependencies:
 
 ```bash
+# Clone the repository
 git clone https://github.com/jeronimoluza/h3forge.git
 cd h3forge
-pip install -r requirements.txt
+
+# Install dependencies using Poetry
+poetry install
 ```
 
 ## 🚀 Usage
@@ -68,10 +71,10 @@ ndvi_array = h3forge.download.sentinel2.get_ndvi(
     cloud_cover=cloud_cover,
 )
 
-# 3. Vectorize the raster data (with date information)
+# 3. Vectorize the raster data
 vectors = h3forge.preprocess.vectorize(ndvi_array, region=region)
 
-# 4. Convert vectors to H3 hexagons (resolution 13)
+# 4. Convert vectors to H3 hexagons
 hexes = h3forge.features.vector_to_h3(vectors, region=region, resolution=13)
 
 # 5. Aggregate to coarser resolution with time aggregation
@@ -89,35 +92,6 @@ h3_agg = h3forge.features.h3_aggregation(
 pytest tests/
 ```
 
-## Key Features
-
-### Data Download
-- Download satellite imagery (Sentinel-2, Sentinel-5P)
-- Filter by date range and cloud cover
-- Automatically clip to region of interest
-
-### Data Processing
-- Convert raster data to vector format
-- Preserve temporal information in vectorized data
-- Filter by region of interest
-
-### H3 Integration
-- Convert vector geometries to H3 hexagons at any resolution
-- Replicate attribute values from input geometries
-- Optionally include hexagon geometries
-
-### Aggregation
-- Aggregate data to coarser H3 resolutions
-- Temporal aggregation (daily, monthly, yearly)
-- Multiple aggregation strategies (mean, sum, min, max)
-- Filter by region of interest
-
 ## 📚 License
 
 [MIT License](LICENSE)
-
----
-
-### 📬 Contact
-
-For questions or collaborations, reach out to [jero.luza@gmail.com](mailto:jero.luza@gmail.com).
