@@ -46,7 +46,7 @@ pip install -r requirements.txt
 
 ## 🚀 Usage
 
-h3forge provides a streamlined workflow for processing geospatial data into H3 hexagons. Here's a typical workflow based on `scripts/run_pipeline.py`:
+h3forge provides a streamlined workflow for processing geospatial data into H3 hexagons.
 
 ```python
 import h3forge
@@ -89,13 +89,7 @@ h3_agg = h3forge.features.h3_aggregation(
 pytest tests/
 ```
 
-## 📖 Notebooks
-
-* `01_download_sources.ipynb`: Download and inspect datasets
-* `02_transform_rasters.ipynb`: Raster-to-vector processing
-* `03_hex_aggregation.ipynb`: Aggregation to H3 for analysis
-
-## 🔍 Key Features
+## Key Features
 
 ### Data Download
 - Download satellite imagery (Sentinel-2, Sentinel-5P)
