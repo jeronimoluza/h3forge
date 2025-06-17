@@ -128,7 +128,6 @@ def h3_aggregation(hexes, region=None, resolution=8, time_agg=None, strategy='me
         result_gdf.rename(columns={'time_group': 'date'}, inplace=True)
         result_gdf['date'] = pd.to_datetime(result_gdf['date']).dt.strftime('%Y-%m-%d')
     
-    print(result_gdf)
     # Sort by hex and date
     result_gdf.sort_values(by=['date', 'hex'], inplace=True)
     
