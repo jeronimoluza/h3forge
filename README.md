@@ -30,10 +30,9 @@ h3forge/
 
 ## 🛰️ Datasets Used
 
-- **Sentinel-5P NO₂** (Copernicus)
-- **Sentinel 2 L2 NDVI**
-- **GHSL Population Density**
-- Socioeconomic data (to be integrated)
+- **Sentinel-5P**
+- **Sentinel 2 Level-2**
+- **Global Human Settlements Layer (GHSL)**
 
 ## ⚙️ Installation
 
@@ -92,13 +91,6 @@ h3_agg = h3forge.features.h3_aggregation(
     strategy='mean'  # Aggregation strategy (options: 'mean', 'sum', 'min', 'max')
 )
 ```
-
-You can run the complete example with:
-
-```bash
-python scripts/run_pipeline.py
-```
-
 ## 🧪 Testing
 
 ```bash
