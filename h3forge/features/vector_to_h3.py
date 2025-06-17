@@ -5,7 +5,7 @@ import h3
 from shapely.geometry import Polygon
 
 
-def vector_to_h3(gdf, region=None, resolution=10, include_geometry=False):
+def vector_to_h3(gdf, resolution, region=None, include_geometry=False):
     """
     Convert a GeoDataFrame with geometries to a GeoDataFrame of H3 hexagons.
     
@@ -17,10 +17,10 @@ def vector_to_h3(gdf, region=None, resolution=10, include_geometry=False):
     ----------
     gdf : geopandas.GeoDataFrame
         Input GeoDataFrame with geometries
+    resolution : int
+        H3 resolution to use (0-15)
     region : shapely.geometry.Polygon, optional
         Region to filter the results by
-    resolution : int, default 10
-        H3 resolution to use (0-15)
     include_geometry : bool, default False
         Whether to include the H3 hexagon geometry in the output GeoDataFrame
         
